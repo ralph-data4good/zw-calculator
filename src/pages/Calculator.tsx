@@ -1,94 +1,601 @@
+import { useState, useEffect } from 'react'
+import { Button } from '@/components/ui/button'
+import { Section, SectionTitle, SectionDescription } from '@/components/Section'
+import { Explainer } from '@/components/Explainer'
+import { LabelField } from '@/components/LabelField'
+import { Metric } from '@/components/Metric'
+import { EditDrawer } from '@/components/EditDrawer'
+import { Welcome } from '@/components/StepZero/Welcome'
+import { FeatureCards } from '@/components/StepZero/FeatureCards'
+import { HowItWorks } from '@/components/StepZero/HowItWorks'
+import { Disclaimer } from '@/components/StepZero/Disclaimer'
+import { ScenarioMapper } from '@/components/StepZero/ScenarioMapper'
+import { WastePie } from '@/components/charts/WastePie'
+import { CostBars } from '@/components/charts/CostBars'
+import { SavingsBars } from '@/components/charts/SavingsBars'
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion'
+import { Inputs, Derived, Scenario } from '@/data/types'
+import { DEFAULTS } from '@/data/defaults'
+import { validateInputs, calculateDerived } from '@/lib/validation'
+import { formatCurrency, formatNumber, formatPercent } from '@/lib/format'
+import { getCurrentStep, setStep, listenToHashChange } from '@/lib/hashStep'
+import { ArrowRight, Edit, Download, ChevronLeft } from 'lucide-react'
+
 export function Calculator() {
+  const [currentStep, setCurrentStep] = useState(getCurrentStep())
+  const [inputs, setInputs] = useState<Inputs>(DEFAULTS)
+  const [derived, setDerived] = useState<Derived>(calculateDerived(DEFAULTS))
+  const [errors, setErrors] = useState<Record<string, string>>({})
+  const [showEditDrawer, setShowEditDrawer] = useState(false)
+  const [hasSeenResults, setHasSeenResults] = useState(false)
+
+  // Listen to hash changes
+  useEffect(() => {
+    return listenToHashChange(step => {
+      setCurrentStep(step)
+    })
+  }, [])
+
+  // Recalculate derived values when inputs change
+  useEffect(() => {
+    setDerived(calculateDerived(inputs))
+  }, [inputs])
+
+  const handleScenarioSelect = (scenario: Scenario) => {
+    const newInputs = scenario.apply(inputs)
+    setInputs(newInputs)
+    setStep(1)
+  }
+
+  const handleSkipScenario = () => {
+    setStep(1)
+  }
+
+  const handleShowResults = () => {
+    const validationErrors = validateInputs(inputs)
+    if (validationErrors.length > 0) {
+      const errorMap: Record<string, string> = {}
+      validationErrors.forEach(err => {
+        errorMap[err.field] = err.message
+      })
+      setErrors(errorMap)
+      return
+    }
+
+    setErrors({})
+    setHasSeenResults(true)
+    setStep(2)
+  }
+
+  const handleSaveInputs = (newInputs: Inputs) => {
+    setInputs(newInputs)
+  }
+
+  const handleExportSnapshot = () => {
+    const snapshot = {
+      inputs,
+      derived,
+      createdAt: new Date().toISOString(),
+      version: '1.0.0',
+    }
+
+    const blob = new Blob([JSON.stringify(snapshot, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `zwa-calculator-snapshot-${Date.now()}.json`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  }
+
+  const characterizationSum =
+    inputs.characterization.organics +
+    inputs.characterization.recyclables +
+    inputs.characterization.residuals +
+    inputs.characterization.special
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-teal-50 p-8">
-      <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-5xl font-bold text-gray-900 mb-4">
-            Zero Waste Asia Calculator
-          </h1>
-          <p className="text-xl text-gray-600">
-            Community Waste Management Program Calculator
-          </p>
-          <p className="text-lg text-gray-500 mt-2">
-            Plan effective waste management programs for your community
-          </p>
-        </div>
-
-        {/* Success Card */}
-        <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
-          <div className="flex items-center justify-center mb-6">
-            <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center">
-              <svg className="w-10 h-10 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-            </div>
+    <div className="min-h-screen bg-bg-muted">
+      {/* Header */}
+      <header className="bg-bg border-b border-border sticky top-0 z-40 shadow-sm">
+        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <h1 className="text-xl font-semibold text-fg">ZWA Calculator</h1>
+            {currentStep > 0 && (
+              <span className="text-sm text-fg-muted">
+                Step {currentStep} of 5
+              </span>
+            )}
           </div>
-          
-          <h2 className="text-2xl font-semibold text-center text-gray-900 mb-4">
-            🎉 App is Loading Successfully!
-          </h2>
-          
-          <p className="text-center text-gray-600 mb-6">
-            The Zero Waste Asia Calculator is now running. All components are being loaded...
-          </p>
-
-          <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4 mb-6">
-            <h3 className="font-semibold text-emerald-900 mb-2">✅ System Status</h3>
-            <ul className="space-y-2 text-sm text-emerald-800">
-              <li>✓ React application loaded</li>
-              <li>✓ Tailwind CSS active</li>
-              <li>✓ Theme system initialized</li>
-              <li>✓ Server running on port 5200</li>
-            </ul>
-          </div>
-
-          <div className="text-center">
-            <p className="text-sm text-gray-500 mb-4">
-              Full calculator with all features is being built...
-            </p>
-            <button 
-              className="bg-emerald-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-emerald-700 transition-colors"
-              onClick={() => alert('The full calculator features will be available in a moment!')}
-            >
-              Get Started
-            </button>
+          <div className="flex items-center gap-3">
+            {currentStep > 0 && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setStep(Math.max(0, currentStep - 1))}
+              >
+                <ChevronLeft className="h-4 w-4 mr-1" />
+                Back
+              </Button>
+            )}
+            {hasSeenResults && (
+              <>
+                <Button variant="secondary" size="sm" onClick={() => setShowEditDrawer(true)}>
+                  <Edit className="h-4 w-4 mr-1" />
+                  Edit Inputs
+                </Button>
+                <Button variant="secondary" size="sm" onClick={handleExportSnapshot}>
+                  <Download className="h-4 w-4 mr-1" />
+                  Save Snapshot
+                </Button>
+              </>
+            )}
           </div>
         </div>
+      </header>
 
-        {/* Features Preview */}
-        <div className="grid md:grid-cols-3 gap-6">
-          <div className="bg-white rounded-xl p-6 shadow">
-            <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
-              <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-              </svg>
+      {/* Main Content */}
+      <main className="max-w-6xl mx-auto px-4 py-8">
+        {/* Step 0: Instructions & Scenario Mapping */}
+        {currentStep === 0 && (
+          <div className="space-y-8">
+            <Welcome onGetStarted={() => {
+              const element = document.getElementById('scenario-mapping')
+              element?.scrollIntoView({ behavior: 'smooth' })
+            }} />
+            <FeatureCards />
+            <HowItWorks />
+            <Disclaimer />
+            <div id="scenario-mapping">
+              <ScenarioMapper onSelectScenario={handleScenarioSelect} onSkip={handleSkipScenario} />
             </div>
-            <h3 className="font-semibold text-gray-900 mb-2">Data-Driven Estimates</h3>
-            <p className="text-sm text-gray-600">Get waste characterization and income projections</p>
           </div>
+        )}
 
-          <div className="bg-white rounded-xl p-6 shadow">
-            <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
-              <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
-              </svg>
-            </div>
-            <h3 className="font-semibold text-gray-900 mb-2">Customizable Parameters</h3>
-            <p className="text-sm text-gray-600">Adjust inputs to match your community's needs</p>
-          </div>
+        {/* Step 1: Inputs */}
+        {currentStep === 1 && (
+          <Section>
+            <SectionTitle>Program Inputs</SectionTitle>
+            <SectionDescription>
+              Enter the parameters for your community's waste management program. All fields are
+              required.
+            </SectionDescription>
 
-          <div className="bg-white rounded-xl p-6 shadow">
-            <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
-              <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
-              </svg>
+            <div className="space-y-6">
+              {/* Basic Info */}
+              <div className="space-y-4">
+                <h3 className="font-medium text-fg">Basic Information</h3>
+                <div className="grid md:grid-cols-2 gap-4">
+                  <LabelField
+                    label="Population Served"
+                    id="population"
+                    value={inputs.population}
+                    onChange={val => setInputs({ ...inputs, population: parseInt(val) || 0 })}
+                    min={1}
+                    error={errors.population}
+                    suffix="people"
+                  />
+                  <LabelField
+                    label="Waste Generation Rate"
+                    id="wastePerCapita"
+                    value={inputs.wastePerCapitaKgDay}
+                    onChange={val =>
+                      setInputs({ ...inputs, wastePerCapitaKgDay: parseFloat(val) || 0 })
+                    }
+                    step="0.01"
+                    min={0}
+                    error={errors.wastePerCapitaKgDay}
+                    suffix="kg/cap/day"
+                  />
+                </div>
+              </div>
+
+              {/* Waste Characterization */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-medium text-fg">Waste Characterization (%)</h3>
+                  <span
+                    className={`text-sm font-medium ${
+                      Math.abs(characterizationSum - 100) < 0.01 ? 'text-primary' : 'text-red-500'
+                    }`}
+                  >
+                    Total: {characterizationSum.toFixed(1)}% {Math.abs(characterizationSum - 100) < 0.01 ? '✓' : ''}
+                  </span>
+                </div>
+                <div className="grid md:grid-cols-2 gap-4">
+                  <LabelField
+                    label="Organics"
+                    id="organics"
+                    value={inputs.characterization.organics}
+                    onChange={val =>
+                      setInputs({
+                        ...inputs,
+                        characterization: {
+                          ...inputs.characterization,
+                          organics: parseFloat(val) || 0,
+                        },
+                      })
+                    }
+                    step="0.1"
+                    min={0}
+                    max={100}
+                    error={errors['characterization.organics']}
+                    suffix="%"
+                  />
+                  <LabelField
+                    label="Recyclables"
+                    id="recyclables"
+                    value={inputs.characterization.recyclables}
+                    onChange={val =>
+                      setInputs({
+                        ...inputs,
+                        characterization: {
+                          ...inputs.characterization,
+                          recyclables: parseFloat(val) || 0,
+                        },
+                      })
+                    }
+                    step="0.1"
+                    min={0}
+                    max={100}
+                    error={errors['characterization.recyclables']}
+                    suffix="%"
+                  />
+                  <LabelField
+                    label="Residuals"
+                    id="residuals"
+                    value={inputs.characterization.residuals}
+                    onChange={val =>
+                      setInputs({
+                        ...inputs,
+                        characterization: {
+                          ...inputs.characterization,
+                          residuals: parseFloat(val) || 0,
+                        },
+                      })
+                    }
+                    step="0.1"
+                    min={0}
+                    max={100}
+                    error={errors['characterization.residuals']}
+                    suffix="%"
+                  />
+                  <LabelField
+                    label="Special"
+                    id="special"
+                    value={inputs.characterization.special}
+                    onChange={val =>
+                      setInputs({
+                        ...inputs,
+                        characterization: {
+                          ...inputs.characterization,
+                          special: parseFloat(val) || 0,
+                        },
+                      })
+                    }
+                    step="0.1"
+                    min={0}
+                    max={100}
+                    error={errors['characterization.special']}
+                    suffix="%"
+                  />
+                </div>
+              </div>
+
+              {/* Baseline Cost */}
+              <div className="space-y-4">
+                <h3 className="font-medium text-fg">Costs</h3>
+                <LabelField
+                  label="Baseline Cost per Ton"
+                  id="baselineCost"
+                  value={inputs.baselineCostPerTon}
+                  onChange={val =>
+                    setInputs({ ...inputs, baselineCostPerTon: parseFloat(val) || 0 })
+                  }
+                  step="100"
+                  min={0}
+                  error={errors.baselineCostPerTon}
+                  helper="Current disposal cost per ton"
+                  suffix="PHP/ton"
+                />
+              </div>
+
+              {/* Composting */}
+              <div className="space-y-4">
+                <h3 className="font-medium text-fg">Composting (Individual)</h3>
+                <div className="grid md:grid-cols-2 gap-4">
+                  <LabelField
+                    label="Adoption Rate"
+                    id="adoption"
+                    value={inputs.compostingAdoption}
+                    onChange={val =>
+                      setInputs({ ...inputs, compostingAdoption: parseFloat(val) || 0 })
+                    }
+                    step="0.01"
+                    min={0}
+                    max={1}
+                    error={errors.compostingAdoption}
+                    helper="0.15 = 15% of households"
+                  />
+                  <LabelField
+                    label="Diversion Efficiency"
+                    id="efficiency"
+                    value={inputs.diversionEfficiency}
+                    onChange={val =>
+                      setInputs({ ...inputs, diversionEfficiency: parseFloat(val) || 0 })
+                    }
+                    step="0.01"
+                    min={0}
+                    max={1}
+                    error={errors.diversionEfficiency}
+                    helper="0.6 = 60% successfully composted"
+                  />
+                  <LabelField
+                    label="Compost Price per kg"
+                    id="compostPrice"
+                    value={inputs.compostPricePerKg}
+                    onChange={val =>
+                      setInputs({ ...inputs, compostPricePerKg: parseFloat(val) || 0 })
+                    }
+                    step="0.5"
+                    min={0}
+                    error={errors.compostPricePerKg}
+                    suffix="PHP"
+                  />
+                </div>
+              </div>
             </div>
-            <h3 className="font-semibold text-gray-900 mb-2">Visual Insights</h3>
-            <p className="text-sm text-gray-600">Interactive charts show cost savings and impacts</p>
-          </div>
-        </div>
-      </div>
+
+            {Object.keys(errors).length > 0 && (
+              <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+                <p className="font-medium mb-2">Please fix the following errors:</p>
+                <ul className="list-disc list-inside space-y-1">
+                  {Object.values(errors).map((error, i) => (
+                    <li key={i}>{error}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            <Button onClick={handleShowResults} size="lg" className="w-full md:w-auto">
+              Show Results <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          </Section>
+        )}
+
+        {/* Step 2: Review & Understand the Math */}
+        {currentStep === 2 && (
+          <Section>
+            <SectionTitle>Review & Understand the Math</SectionTitle>
+            <SectionDescription>
+              Explore how your inputs translate into waste generation, costs, and program impacts.
+            </SectionDescription>
+
+            <Accordion type="multiple" defaultValue={['waste', 'baseline']} className="space-y-2">
+              <AccordionItem value="waste">
+                <AccordionTrigger className="text-left">
+                  Total Waste Generated
+                </AccordionTrigger>
+                <AccordionContent>
+                  <Explainer>
+                    <div className="space-y-2">
+                      <p>
+                        <strong>Daily waste:</strong> {inputs.population} people × {inputs.wastePerCapitaKgDay} kg/cap/day = <strong>{formatNumber(derived.totalDailyKg, 2)} kg/day</strong>
+                      </p>
+                      <p>
+                        <strong>Annual waste:</strong> {formatNumber(derived.totalDailyKg, 2)} kg/day × 365 days ÷ 1,000 = <strong>{formatNumber(derived.totalAnnualTons, 2)} tons/year</strong>
+                      </p>
+                    </div>
+                  </Explainer>
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="characterization">
+                <AccordionTrigger className="text-left">
+                  Waste Characterization by Stream
+                </AccordionTrigger>
+                <AccordionContent>
+                  <Explainer>
+                    <div className="space-y-2">
+                      <p>
+                        <strong>Organics:</strong> {formatNumber(derived.totalAnnualTons, 2)} t/yr × {inputs.characterization.organics}% = <strong>{formatNumber(derived.shares.organics, 2)} t/yr</strong>
+                      </p>
+                      <p>
+                        <strong>Recyclables:</strong> {formatNumber(derived.totalAnnualTons, 2)} t/yr × {inputs.characterization.recyclables}% = <strong>{formatNumber(derived.shares.recyclables, 2)} t/yr</strong>
+                      </p>
+                      <p>
+                        <strong>Residuals:</strong> {formatNumber(derived.totalAnnualTons, 2)} t/yr × {inputs.characterization.residuals}% = <strong>{formatNumber(derived.shares.residuals, 2)} t/yr</strong>
+                      </p>
+                      <p>
+                        <strong>Special:</strong> {formatNumber(derived.totalAnnualTons, 2)} t/yr × {inputs.characterization.special}% = <strong>{formatNumber(derived.shares.special, 2)} t/yr</strong>
+                      </p>
+                    </div>
+                  </Explainer>
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="baseline">
+                <AccordionTrigger className="text-left">
+                  Baseline System Cost
+                </AccordionTrigger>
+                <AccordionContent>
+                  <Explainer>
+                    <p>
+                      {formatNumber(derived.totalAnnualTons, 2)} tons/year × {formatCurrency(inputs.baselineCostPerTon, 0)}/ton = <strong>{formatCurrency(derived.baselineCost, 0)}/year</strong>
+                    </p>
+                    <p className="text-xs mt-2">This is the cost of disposing all waste with no diversion programs.</p>
+                  </Explainer>
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="composting">
+                <AccordionTrigger className="text-left">
+                  Composting Impact (Individual)
+                </AccordionTrigger>
+                <AccordionContent>
+                  <Explainer>
+                    <div className="space-y-2">
+                      <p>
+                        <strong>Diverted organics:</strong> {formatNumber(derived.shares.organics, 2)} t/yr × {formatPercent(inputs.compostingAdoption)} adoption × {formatPercent(inputs.diversionEfficiency)} efficiency = <strong>{formatNumber(derived.divertedOrganicsTons, 2)} t/yr</strong>
+                      </p>
+                      <p>
+                        <strong>Compost produced:</strong> {formatNumber(derived.divertedOrganicsTons, 2)} tons × 1,000 = <strong>{formatNumber(derived.compostKg, 0)} kg</strong>
+                      </p>
+                      <p>
+                        <strong>Compost revenue:</strong> {formatNumber(derived.compostKg, 0)} kg × {formatCurrency(inputs.compostPricePerKg, 2)}/kg = <strong>{formatCurrency(derived.compostRevenue, 0)}</strong>
+                      </p>
+                      <p>
+                        <strong>Avoided disposal cost:</strong> {formatNumber(derived.divertedOrganicsTons, 2)} t/yr × {formatCurrency(inputs.baselineCostPerTon, 0)}/ton = <strong>{formatCurrency(derived.avoidedDisposalSavings, 0)}</strong>
+                      </p>
+                    </div>
+                  </Explainer>
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="after">
+                <AccordionTrigger className="text-left">
+                  After-Program Cost
+                </AccordionTrigger>
+                <AccordionContent>
+                  <Explainer>
+                    <p>
+                      {formatCurrency(derived.baselineCost, 0)} (baseline) − {formatCurrency(derived.avoidedDisposalSavings, 0)} (avoided disposal) = <strong>{formatCurrency(derived.afterZWCost, 0)}/year</strong>
+                    </p>
+                    <p className="text-xs mt-2">
+                      <em>Note:</em> This first-pass estimate excludes program O&M costs, CAPEX amortization, and recycling revenues. Future versions will include these modules.
+                    </p>
+                  </Explainer>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+
+            <div className="flex gap-3 mt-6">
+              <Button onClick={() => setStep(3)} size="lg">
+                View Charts <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </div>
+          </Section>
+        )}
+
+        {/* Step 3: Waste Characterization Chart */}
+        {currentStep === 3 && (
+          <Section>
+            <SectionTitle>Step 3: Waste Characterization</SectionTitle>
+            <SectionDescription>
+              Distribution of waste by stream for your community (tons per year).
+            </SectionDescription>
+
+            <WastePie derived={derived} />
+
+            <Explainer className="mt-6">
+              This pie chart shows the breakdown of your {formatNumber(derived.totalAnnualTons, 2)} tons/year of total waste. Organics represent the largest opportunity for composting programs.
+            </Explainer>
+
+            <div className="grid md:grid-cols-4 gap-4 mt-6">
+              <Metric label="Organics" value={`${formatNumber(derived.shares.organics, 1)} t/yr`} />
+              <Metric label="Recyclables" value={`${formatNumber(derived.shares.recyclables, 1)} t/yr`} />
+              <Metric label="Residuals" value={`${formatNumber(derived.shares.residuals, 1)} t/yr`} />
+              <Metric label="Special" value={`${formatNumber(derived.shares.special, 1)} t/yr`} />
+            </div>
+
+            <Button onClick={() => setStep(4)} size="lg" className="mt-6">
+              Next: Cost Comparison <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          </Section>
+        )}
+
+        {/* Step 4: Total Cost Comparison */}
+        {currentStep === 4 && (
+          <Section>
+            <SectionTitle>Step 4: Total Cost — Before vs After</SectionTitle>
+            <SectionDescription>
+              Compare your baseline waste management costs with costs after implementing composting.
+            </SectionDescription>
+
+            <CostBars derived={derived} />
+
+            <div className="grid md:grid-cols-2 gap-4 mt-6">
+              <Metric
+                label="Before ZW Program"
+                value={formatCurrency(derived.baselineCost, 0)}
+                subtext="Annual disposal cost"
+              />
+              <Metric
+                label="After Diversion (Organics)"
+                value={formatCurrency(derived.afterZWCost, 0)}
+                subtext="Net cost after avoided disposal"
+              />
+            </div>
+
+            <Explainer className="mt-6">
+              By diverting {formatNumber(derived.divertedOrganicsTons, 2)} tons of organics through composting, you reduce disposal costs by {formatCurrency(derived.avoidedDisposalSavings, 0)} per year.
+            </Explainer>
+
+            <Button onClick={() => setStep(5)} size="lg" className="mt-6">
+              Next: Savings & Income <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          </Section>
+        )}
+
+        {/* Step 5: Savings & Income */}
+        {currentStep === 5 && (
+          <Section>
+            <SectionTitle>Step 5: Savings & Income</SectionTitle>
+            <SectionDescription>
+              Financial benefits from avoided disposal costs and compost sales.
+            </SectionDescription>
+
+            <SavingsBars derived={derived} />
+
+            <div className="grid md:grid-cols-2 gap-4 mt-6">
+              <Metric
+                label="Avoided Disposal Savings"
+                value={formatCurrency(derived.avoidedDisposalSavings, 0)}
+                subtext="Cost reduction from diversion"
+              />
+              <Metric
+                label="Compost Revenue"
+                value={formatCurrency(derived.compostRevenue, 0)}
+                subtext="Income from compost sales"
+              />
+            </div>
+
+            <Explainer className="mt-6" title="Important Notes">
+              <ul className="list-disc list-inside space-y-1">
+                <li>Avoided disposal savings assume the diverted waste would otherwise be disposed at baseline cost.</li>
+                <li>Compost revenue assumes all produced compost is sold at the specified price.</li>
+                <li>This estimate excludes program operational costs (staff, education, monitoring).</li>
+                <li>For procurement or formal planning, conduct a detailed feasibility study.</li>
+              </ul>
+            </Explainer>
+
+            <div className="flex gap-3 mt-6">
+              <Button onClick={() => setStep(2)} variant="secondary">
+                Back to Math Review
+              </Button>
+              <Button onClick={() => setShowEditDrawer(true)} variant="primary">
+                <Edit className="mr-2 h-4 w-4" />
+                Adjust Parameters
+              </Button>
+            </div>
+          </Section>
+        )}
+      </main>
+
+      {/* Edit Drawer */}
+      <EditDrawer
+        isOpen={showEditDrawer}
+        onClose={() => setShowEditDrawer(false)}
+        inputs={inputs}
+        onSave={handleSaveInputs}
+      />
     </div>
   )
 }
