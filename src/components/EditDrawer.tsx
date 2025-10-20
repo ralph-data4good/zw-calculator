@@ -10,7 +10,6 @@ import { Button } from '@/components/ui/button'
 import { LabelField } from '@/components/LabelField'
 import { Inputs } from '@/data/types'
 import { validateInputs } from '@/lib/validation'
-import { X } from 'lucide-react'
 
 interface EditDrawerProps {
   isOpen: boolean
