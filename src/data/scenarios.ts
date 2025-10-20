@@ -113,27 +113,55 @@ export const SCENARIOS: Scenario[] = [
 export function suggestScenario(mapping: ScenarioMappingInputs): Scenario {
   const { areaType, isCoastalIsland, terrain, dominantActivities, populationBand } = mapping
 
-  // Island check
+  // Priority 1: Island/Coastal areas (high transportation costs, unique challenges)
   if (isCoastalIsland === 'Yes') {
     return SCENARIOS.find(s => s.id === 'island-organics-recycling') || SCENARIOS[4]
   }
 
-  // Mountain check
+  // Priority 2: Mountain/Agriculture (high organics, remote location)
   if (terrain === 'Mountainous' || dominantActivities.includes('Agriculture')) {
     return SCENARIOS.find(s => s.id === 'mountain-organics') || SCENARIOS[4]
   }
 
-  // Rural check
-  if (areaType === 'Rural' || populationBand === '<25k') {
+  // Priority 3: Tourism areas (typically coastal/island, high packaging waste)
+  // Tourism areas often benefit from island-style programs even if not strictly islands
+  if (dominantActivities.includes('Tourism')) {
+    return SCENARIOS.find(s => s.id === 'island-organics-recycling') || SCENARIOS[4]
+  }
+
+  // Priority 4: Commercial/Mixed urban areas (high recyclables potential)
+  if (
+    dominantActivities.includes('Commercial') ||
+    (areaType === 'Urban' && dominantActivities.includes('Mixed'))
+  ) {
+    return SCENARIOS.find(s => s.id === 'urban-organics-recycling') || SCENARIOS[4]
+  }
+
+  // Priority 5: Residential-heavy or Rural areas (high organics from food waste)
+  if (
+    dominantActivities.includes('Residential') ||
+    areaType === 'Rural' ||
+    populationBand === '<25k'
+  ) {
     return SCENARIOS.find(s => s.id === 'rural-organics') || SCENARIOS[4]
   }
 
-  // Urban check
+  // Priority 6: Urban areas by population/area type
   if (areaType === 'Urban' || populationBand === '>500k') {
     return SCENARIOS.find(s => s.id === 'urban-organics-recycling') || SCENARIOS[4]
   }
 
-  // Default fallback
+  // Priority 7: Peri-urban areas (moderate density, mixed characteristics)
+  if (areaType === 'Peri-urban') {
+    // If small to medium peri-urban, lean rural; if large, lean urban
+    if (populationBand === '25-100k') {
+      return SCENARIOS.find(s => s.id === 'rural-organics') || SCENARIOS[4]
+    } else {
+      return SCENARIOS.find(s => s.id === 'urban-organics-recycling') || SCENARIOS[4]
+    }
+  }
+
+  // Default fallback for unclear/unsure cases
   return SCENARIOS[4]
 }
 

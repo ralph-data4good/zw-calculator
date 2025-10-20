@@ -137,6 +137,61 @@ export function ScenarioMapper({ onSelectScenario, onSkip }: ScenarioMapperProps
           </p>
         </div>
 
+        {/* Dominant Activities - NEW! */}
+        <div className="space-y-2 md:col-span-2">
+          <Label>Dominant activities (pick up to 2)</Label>
+          <div className="flex flex-wrap gap-2">
+            {(['Residential', 'Commercial', 'Tourism', 'Agriculture', 'Mixed', 'Unsure'] as const).map(
+              activity => (
+                <button
+                  key={activity}
+                  type="button"
+                  onClick={() => {
+                    const current = mapping.dominantActivities
+                    if (current.includes(activity)) {
+                      // Remove if already selected
+                      setMapping({
+                        ...mapping,
+                        dominantActivities: current.filter(a => a !== activity),
+                      })
+                    } else if (current.length < 2) {
+                      // Add if less than 2 selected
+                      setMapping({
+                        ...mapping,
+                        dominantActivities: [...current, activity],
+                      })
+                    }
+                  }}
+                  className={`px-4 py-2 rounded-lg border text-sm font-medium transition-colors ${
+                    mapping.dominantActivities.includes(activity)
+                      ? 'border-primary bg-primary/10 text-primary'
+                      : 'border-border bg-bg hover:bg-bg-muted text-fg'
+                  } ${
+                    !mapping.dominantActivities.includes(activity) &&
+                    mapping.dominantActivities.length >= 2
+                      ? 'opacity-50 cursor-not-allowed'
+                      : 'cursor-pointer'
+                  }`}
+                  disabled={
+                    !mapping.dominantActivities.includes(activity) &&
+                    mapping.dominantActivities.length >= 2
+                  }
+                >
+                  {activity}
+                </button>
+              ),
+            )}
+          </div>
+          <p className="text-xs text-fg-muted">
+            Add rough % for each activity. Choose "Unsure" if you don't know.
+          </p>
+          {mapping.dominantActivities.length > 0 && (
+            <div className="text-sm text-primary font-medium">
+              Selected: {mapping.dominantActivities.join(', ')}
+            </div>
+          )}
+        </div>
+
         {/* Population Band */}
         <div className="space-y-2">
           <Label htmlFor="popBand">Population Band</Label>

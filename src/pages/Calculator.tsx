@@ -5,6 +5,7 @@ import { Explainer } from '@/components/Explainer'
 import { LabelField } from '@/components/LabelField'
 import { Metric } from '@/components/Metric'
 import { EditDrawer } from '@/components/EditDrawer'
+import { PrintView } from '@/components/PrintView'
 import { Welcome } from '@/components/StepZero/Welcome'
 import { FeatureCards } from '@/components/StepZero/FeatureCards'
 import { HowItWorks } from '@/components/StepZero/HowItWorks'
@@ -24,7 +25,7 @@ import { DEFAULTS } from '@/data/defaults'
 import { validateInputs, calculateDerived } from '@/lib/validation'
 import { formatCurrency, formatNumber, formatPercent } from '@/lib/format'
 import { getCurrentStep, setStep, listenToHashChange } from '@/lib/hashStep'
-import { ArrowRight, Edit, Download, ChevronLeft } from 'lucide-react'
+import { ArrowRight, Edit, Download, ChevronLeft, Share2, Printer } from 'lucide-react'
 
 export function Calculator() {
   const [currentStep, setCurrentStep] = useState(getCurrentStep())
@@ -33,6 +34,7 @@ export function Calculator() {
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [showEditDrawer, setShowEditDrawer] = useState(false)
   const [hasSeenResults, setHasSeenResults] = useState(false)
+  const [scenarioName, setScenarioName] = useState<string>('')
 
   // Listen to hash changes
   useEffect(() => {
@@ -49,6 +51,7 @@ export function Calculator() {
   const handleScenarioSelect = (scenario: Scenario) => {
     const newInputs = scenario.apply(inputs)
     setInputs(newInputs)
+    setScenarioName(scenario.name)
     setStep(1)
   }
 
@@ -93,6 +96,30 @@ export function Calculator() {
     a.click()
     document.body.removeChild(a)
     URL.revokeObjectURL(url)
+  }
+
+  const handleShare = async () => {
+    const shareData = {
+      title: 'Zero Waste Asia Calculator Results',
+      text: `Zero Waste Calculator - Population: ${inputs.population.toLocaleString()}, Annual Waste: ${formatNumber(derived.totalAnnualTons, 1)} tons, Net Savings: ${formatCurrency(derived.avoidedDisposalSavings + derived.compostRevenue - derived.afterZWCost, 0)}`,
+      url: window.location.href,
+    }
+
+    try {
+      if (navigator.share && navigator.canShare(shareData)) {
+        await navigator.share(shareData)
+      } else {
+        // Fallback: copy URL to clipboard
+        await navigator.clipboard.writeText(window.location.href)
+        alert('Link copied to clipboard!')
+      }
+    } catch (err) {
+      console.error('Error sharing:', err)
+    }
+  }
+
+  const handlePrint = () => {
+    window.print()
   }
 
   const characterizationSum =
@@ -576,14 +603,37 @@ export function Calculator() {
               </ul>
             </Explainer>
 
-            <div className="flex gap-3 mt-6">
+            <div className="flex flex-wrap gap-3 mt-6">
               <Button onClick={() => setStep(2)} variant="secondary">
+                <ChevronLeft className="mr-2 h-4 w-4" />
                 Back to Math Review
               </Button>
               <Button onClick={() => setShowEditDrawer(true)} variant="primary">
                 <Edit className="mr-2 h-4 w-4" />
                 Adjust Parameters
               </Button>
+            </div>
+
+            {/* Share and Print Section */}
+            <div className="mt-8 pt-6 border-t border-border">
+              <h3 className="text-lg font-semibold text-fg mb-3">Share Your Results</h3>
+              <p className="text-sm text-fg-muted mb-4">
+                Share your calculator results or print a copy for your records.
+              </p>
+              <div className="flex flex-wrap gap-3">
+                <Button onClick={handleShare} variant="secondary">
+                  <Share2 className="mr-2 h-4 w-4" />
+                  Share Results
+                </Button>
+                <Button onClick={handlePrint} variant="secondary">
+                  <Printer className="mr-2 h-4 w-4" />
+                  Print Report
+                </Button>
+                <Button onClick={handleExportSnapshot} variant="secondary">
+                  <Download className="mr-2 h-4 w-4" />
+                  Download Data (JSON)
+                </Button>
+              </div>
             </div>
           </Section>
         )}
@@ -596,6 +646,9 @@ export function Calculator() {
         inputs={inputs}
         onSave={handleSaveInputs}
       />
+
+      {/* Print View - Hidden until print */}
+      <PrintView inputs={inputs} derived={derived} scenarioName={scenarioName} />
     </div>
   )
 }

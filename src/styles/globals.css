@@ -28,3 +28,68 @@
     text-wrap: balance;
   }
 }
+
+/* Print Styles */
+@media print {
+  /* Hide everything except print view during print */
+  body > div:first-child > main,
+  body > div:first-child > header,
+  nav,
+  button,
+  .no-print {
+    display: none !important;
+  }
+
+  /* Show print view */
+  .print-only {
+    display: block !important;
+  }
+
+  /* Ensure proper page breaks */
+  .page-break-avoid {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  .page-break-inside-avoid {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  /* Ensure charts print properly */
+  .recharts-wrapper,
+  .recharts-surface {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+    width: 100% !important;
+    height: 100% !important;
+  }
+
+  /* Force SVG rendering for print */
+  .recharts-wrapper svg,
+  .recharts-surface svg {
+    width: 100% !important;
+    height: 100% !important;
+  }
+
+  /* Ensure chart containers have proper dimensions */
+  .print-only [class*="h-[300px]"] {
+    height: 300px !important;
+  }
+
+  .print-only [class*="h-[250px]"] {
+    height: 250px !important;
+  }
+
+  /* Set proper margins */
+  @page {
+    size: A4;
+    margin: 1.5cm 2cm;
+  }
+
+  /* Ensure colors print */
+  * {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+}
