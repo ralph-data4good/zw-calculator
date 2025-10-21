@@ -1,43 +1,106 @@
 :root {
-  /* Brand colors */
-  --brand-600: #059669;
-  --brand-400: #34d399;
+  /* Eco Design System - Primary Colors */
+  --eco-soft-green-1: #A8C5A3;
+  --eco-soft-green-2: #B8D4B8;
+  --eco-soft-green-3: #9BB89B;
+  --eco-soft-green-4: #E8F0E8;
+  
+  --eco-vibrant-green-1: #4A7C59;
+  --eco-vibrant-green-2: #5A8C69;
+  --eco-vibrant-green-3: #3A6C49;
+  
+  --eco-accent-yellow-1: #F5C563;
+  --eco-accent-yellow-2: #E8B84D;
+  --eco-accent-yellow-3: #D4A440;
+
+  /* Neutrals */
+  --eco-bg-white: #FFFFFF;
+  --eco-bg-light-1: #F8F9F8;
+  --eco-bg-light-2: #F5F7F5;
+  --eco-bg-light-3: #FEFFFE;
+  
+  --eco-text-dark-1: #1A1A1A;
+  --eco-text-dark-2: #2D3E2D;
+  --eco-text-dark-3: #3F4F3F;
+  
+  --eco-border-1: #E0E5E0;
+  --eco-border-2: #D5DAD5;
+  --eco-border-3: #C8CEC8;
+
+  /* Dark mode colors */
+  --eco-navy-1: #2C3E50;
+  --eco-navy-2: #34495E;
+  --eco-navy-3: #1C2833;
+
+  /* Brand colors - mapped to eco palette */
+  --brand-600: var(--eco-vibrant-green-1);
+  --brand-500: var(--eco-vibrant-green-2);
+  --brand-400: var(--eco-soft-green-1);
 
   /* Backgrounds */
-  --bg: #ffffff;
-  --bg-muted: #f6f7f9;
+  --bg: var(--eco-bg-white);
+  --bg-muted: var(--eco-bg-light-2);
+  --bg-card: var(--eco-bg-light-3);
 
   /* Foregrounds */
-  --fg: #0b1321;
-  --fg-muted: #6b7280;
+  --fg: var(--eco-text-dark-1);
+  --fg-muted: var(--eco-text-dark-3);
 
   /* Border */
-  --border: #e5e7eb;
+  --border: var(--eco-border-1);
+  --border-muted: var(--eco-border-2);
 
-  /* Primary (mapped to brand) */
-  --primary: var(--brand-600);
+  /* Primary (mapped to vibrant green) */
+  --primary: var(--eco-vibrant-green-1);
+  --primary-light: var(--eco-vibrant-green-2);
+  --primary-dark: var(--eco-vibrant-green-3);
   --primary-contrast: #ffffff;
 
-  /* Font */
-  --font-sans: "Schibsted Grotesk", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  /* Accent (mapped to yellow) */
+  --accent: var(--eco-accent-yellow-1);
+  --accent-dark: var(--eco-accent-yellow-3);
 
-  /* Border radius */
-  --radius-md: 0.75rem;
-  --radius-lg: 1rem;
-  --radius-2xl: 1.25rem;
+  /* Font - Eco Design System recommends system sans-serif */
+  --font-sans: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, ui-sans-serif, system-ui, sans-serif;
 
-  /* Shadows */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.06);
-  --shadow-md: 0 2px 6px rgba(0, 0, 0, 0.08);
-  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+  /* Border radius - Eco Design System values */
+  --radius-sm: 0.5rem;    /* 8px */
+  --radius-md: 0.75rem;   /* 12px */
+  --radius-lg: 1rem;      /* 16px */
+  --radius-xl: 1.5rem;    /* 24px */
+  --radius-2xl: 2rem;     /* 32px */
+  --radius-pill: 999px;
+
+  /* Shadows - Organic, soft shadows with low opacity */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.03);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.08), 0 4px 6px rgba(0, 0, 0, 0.05);
+
+  /* Spacing - 8px base unit */
+  --spacing-xs: 0.25rem;  /* 4px */
+  --spacing-sm: 0.5rem;   /* 8px */
+  --spacing-md: 1rem;     /* 16px */
+  --spacing-lg: 1.5rem;   /* 24px */
+  --spacing-xl: 2rem;     /* 32px */
+  --spacing-2xl: 3rem;    /* 48px */
+  --spacing-3xl: 4rem;    /* 64px */
+  --spacing-4xl: 6rem;    /* 96px */
+
+  /* Transitions - Eco Design System values */
+  --transition-fast: 200ms ease-out;
+  --transition-normal: 300ms ease-out;
+  --transition-smooth: 300ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 :root.dark {
-  --bg: #0b1020;
-  --bg-muted: #0f162e;
-  --fg: #e6e8ec;
-  --fg-muted: #9aa3b2;
-  --border: #243249;
-  --primary: var(--brand-400);
-  --primary-contrast: #071019;
+  --bg: var(--eco-navy-3);
+  --bg-muted: var(--eco-navy-1);
+  --bg-card: var(--eco-navy-2);
+  --fg: var(--eco-bg-light-1);
+  --fg-muted: var(--eco-soft-green-4);
+  --border: rgba(255, 255, 255, 0.1);
+  --border-muted: rgba(255, 255, 255, 0.05);
+  --primary: var(--eco-soft-green-1);
+  --primary-light: var(--eco-soft-green-2);
+  --primary-contrast: var(--eco-navy-3);
 }
