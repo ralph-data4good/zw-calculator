@@ -45,10 +45,10 @@ export function LabelField({
           min={min}
           max={max}
           step={step}
-          className={cn(error && 'border-red-500')}
+          className={cn(error && 'border-red-500', suffix && 'pr-24')}
         />
         {suffix && (
-          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-fg-muted">
+          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-fg-muted pointer-events-none select-none bg-bg px-1">
             {suffix}
           </span>
         )}

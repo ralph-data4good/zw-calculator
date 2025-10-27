@@ -207,7 +207,7 @@ export function Calculator() {
             <SectionDescription>
               {localityName ? (
                 <>
-                  Enter the parameters for <strong>{localityName}</strong>, {country}. All fields are required.
+                  Enter the parameters for <span className="font-bold text-primary text-lg">{localityName}, {country}</span>. All fields are required.
                 </>
               ) : (
                 <>
@@ -539,7 +539,7 @@ export function Calculator() {
             <SectionDescription>
               {localityName ? (
                 <>
-                  Distribution of waste by stream for <strong>{localityName}</strong>, {country} (tons per year).
+                  Distribution of waste by stream for <span className="font-bold text-primary text-lg">{localityName}, {country}</span> (tons per year).
                 </>
               ) : (
                 <>
@@ -607,7 +607,7 @@ export function Calculator() {
             <SectionDescription>
               {localityName ? (
                 <>
-                  Financial benefits from avoided disposal costs and compost sales for <strong>{localityName}</strong>, {country}.
+                  Financial benefits from avoided disposal costs and compost sales for <span className="font-bold text-primary text-lg">{localityName}, {country}</span>.
                 </>
               ) : (
                 <>
