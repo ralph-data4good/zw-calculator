@@ -676,7 +676,7 @@ export function Calculator() {
       />
 
       {/* Print View - Hidden until print */}
-      <PrintView inputs={inputs} derived={derived} scenarioName={scenarioName} />
+      <PrintView inputs={inputs} derived={derived} scenarioName={scenarioName} country={country} localityName={localityName} />
     </div>
   )
 }

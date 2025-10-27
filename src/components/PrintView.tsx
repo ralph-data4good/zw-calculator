@@ -1,5 +1,5 @@
 import { Inputs, Derived } from '@/data/types'
-import { formatCurrency, formatNumber, formatPercent } from '@/lib/format'
+import { formatCurrency, formatNumber, formatPercent, type Country } from '@/lib/format'
 import { WastePie } from './charts/WastePie'
 import { CostBars } from './charts/CostBars'
 import { SavingsBars } from './charts/SavingsBars'
@@ -8,9 +8,11 @@ interface PrintViewProps {
   inputs: Inputs
   derived: Derived
   scenarioName?: string
+  country?: Country
+  localityName?: string
 }
 
-export function PrintView({ inputs, derived, scenarioName }: PrintViewProps) {
+export function PrintView({ inputs, derived, scenarioName, country = 'Philippines', localityName }: PrintViewProps) {
   const netSavings =
     derived.avoidedDisposalSavings + derived.compostRevenue - (derived.baselineCost - derived.afterZWCost)
 
@@ -59,6 +61,11 @@ export function PrintView({ inputs, derived, scenarioName }: PrintViewProps) {
               <strong>Scenario:</strong> {scenarioName}
             </p>
           )}
+          {localityName && (
+            <p className="text-base mb-3">
+              <strong>Location:</strong> {localityName}, {country}
+            </p>
+          )}
           <div className="grid grid-cols-2 gap-4 bg-bg-muted p-4 rounded-lg">
             <div>
               <p className="text-sm text-fg-muted">Population</p>
@@ -70,11 +77,11 @@ export function PrintView({ inputs, derived, scenarioName }: PrintViewProps) {
             </div>
             <div>
               <p className="text-sm text-fg-muted">Baseline Cost</p>
-              <p className="text-xl font-semibold">{formatCurrency(derived.baselineCost, 0)}</p>
+              <p className="text-xl font-semibold">{formatCurrency(derived.baselineCost, country, 0)}</p>
             </div>
             <div>
               <p className="text-sm text-fg-muted">Estimated Net Savings</p>
-              <p className="text-xl font-semibold text-primary">{formatCurrency(netSavings, 0)}</p>
+              <p className="text-xl font-semibold text-primary">{formatCurrency(netSavings, country, 0)}</p>
             </div>
           </div>
         </div>
@@ -94,7 +101,7 @@ export function PrintView({ inputs, derived, scenarioName }: PrintViewProps) {
               </div>
               <div>
                 <span className="text-fg-muted">Baseline Cost per Ton:</span>
-                <span className="ml-2 font-semibold">{formatCurrency(inputs.baselineCostPerTon, 0)}</span>
+                <span className="ml-2 font-semibold">{formatCurrency(inputs.baselineCostPerTon, country, 0)}</span>
               </div>
               <div>
                 <span className="text-fg-muted">Composting Adoption:</span>
@@ -106,7 +113,7 @@ export function PrintView({ inputs, derived, scenarioName }: PrintViewProps) {
               </div>
               <div>
                 <span className="text-fg-muted">Compost Price:</span>
-                <span className="ml-2 font-semibold">{formatCurrency(inputs.compostPricePerKg, 2)}/kg</span>
+                <span className="ml-2 font-semibold">{formatCurrency(inputs.compostPricePerKg, country, 2)}/kg</span>
               </div>
             </div>
 
@@ -186,13 +193,13 @@ export function PrintView({ inputs, derived, scenarioName }: PrintViewProps) {
             <div>
               <h3 className="text-lg font-semibold mb-2">Cost Comparison</h3>
               <div className="h-[250px]">
-                <CostBars derived={derived} />
+                <CostBars derived={derived} country={country} />
               </div>
             </div>
             <div>
               <h3 className="text-lg font-semibold mb-2">Savings Breakdown</h3>
               <div className="h-[250px]">
-                <SavingsBars derived={derived} />
+                <SavingsBars derived={derived} country={country} />
               </div>
             </div>
           </div>
@@ -207,7 +214,7 @@ export function PrintView({ inputs, derived, scenarioName }: PrintViewProps) {
               <h3 className="text-base font-semibold text-fg mb-2">Baseline Scenario (Business as Usual)</h3>
               <div className="bg-red-50 p-3 rounded">
                 <p className="text-sm text-fg-muted">Annual Disposal Cost</p>
-                <p className="text-2xl font-bold text-red-700">{formatCurrency(derived.baselineCost, 0)}</p>
+                <p className="text-2xl font-bold text-red-700">{formatCurrency(derived.baselineCost, country, 0)}</p>
               </div>
             </div>
 
@@ -216,15 +223,15 @@ export function PrintView({ inputs, derived, scenarioName }: PrintViewProps) {
               <div className="grid grid-cols-3 gap-3">
                 <div className="bg-green-50 p-3 rounded">
                   <p className="text-xs text-fg-muted">Compost Revenue</p>
-                  <p className="text-lg font-bold text-green-700">{formatCurrency(derived.compostRevenue, 0)}</p>
+                  <p className="text-lg font-bold text-green-700">{formatCurrency(derived.compostRevenue, country, 0)}</p>
                 </div>
                 <div className="bg-blue-50 p-3 rounded">
                   <p className="text-xs text-fg-muted">Avoided Disposal</p>
-                  <p className="text-lg font-bold text-blue-700">{formatCurrency(derived.avoidedDisposalSavings, 0)}</p>
+                  <p className="text-lg font-bold text-blue-700">{formatCurrency(derived.avoidedDisposalSavings, country, 0)}</p>
                 </div>
                 <div className="bg-primary/10 p-3 rounded">
                   <p className="text-xs text-fg-muted">Net Savings</p>
-                  <p className="text-lg font-bold text-primary">{formatCurrency(netSavings, 0)}</p>
+                  <p className="text-lg font-bold text-primary">{formatCurrency(netSavings, country, 0)}</p>
                 </div>
               </div>
             </div>
@@ -242,7 +249,7 @@ export function PrintView({ inputs, derived, scenarioName }: PrintViewProps) {
                 </div>
                 <div className="flex justify-between border-b border-border pb-1">
                   <span className="text-fg-muted">After ZW Cost:</span>
-                  <span className="font-semibold">{formatCurrency(derived.afterZWCost, 0)}</span>
+                  <span className="font-semibold">{formatCurrency(derived.afterZWCost, country, 0)}</span>
                 </div>
                 <div className="flex justify-between border-b border-border pb-1">
                   <span className="text-fg-muted">Cost Reduction:</span>
@@ -266,16 +273,16 @@ export function PrintView({ inputs, derived, scenarioName }: PrintViewProps) {
               can be diverted annually.
             </li>
             <li>
-              <strong>Revenue Generation:</strong> Compost sales at {formatCurrency(inputs.compostPricePerKg, 2)}/kg
-              could generate {formatCurrency(derived.compostRevenue, 0)} annually.
+              <strong>Revenue Generation:</strong> Compost sales at {formatCurrency(inputs.compostPricePerKg, country, 2)}/kg
+              could generate {formatCurrency(derived.compostRevenue, country, 0)} annually.
             </li>
             <li>
               <strong>Cost Savings:</strong> Avoiding disposal of diverted waste saves{' '}
-              {formatCurrency(derived.avoidedDisposalSavings, 0)} per year in disposal fees.
+              {formatCurrency(derived.avoidedDisposalSavings, country, 0)} per year in disposal fees.
             </li>
             <li>
               <strong>Net Financial Benefit:</strong> The total estimated net savings is{' '}
-              <strong className="text-primary">{formatCurrency(netSavings, 0)}</strong> annually.
+              <strong className="text-primary">{formatCurrency(netSavings, country, 0)}</strong> annually.
             </li>
           </ul>
         </div>
