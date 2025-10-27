@@ -1,13 +1,50 @@
 /**
- * Format number as currency (PHP)
+ * Currency configuration by country
  */
-export function formatCurrency(value: number, decimals = 0): string {
-  return new Intl.NumberFormat('en-PH', {
+const CURRENCY_CONFIG = {
+  Philippines: {
+    code: 'PHP',
+    locale: 'en-PH',
+    symbol: '₱',
+  },
+  Indonesia: {
+    code: 'IDR',
+    locale: 'id-ID',
+    symbol: 'Rp',
+  },
+} as const
+
+export type Country = keyof typeof CURRENCY_CONFIG
+
+/**
+ * Format number as currency based on country
+ */
+export function formatCurrency(
+  value: number,
+  country: Country = 'Philippines',
+  decimals = 0
+): string {
+  const config = CURRENCY_CONFIG[country]
+  return new Intl.NumberFormat(config.locale, {
     style: 'currency',
-    currency: 'PHP',
+    currency: config.code,
     minimumFractionDigits: decimals,
     maximumFractionDigits: decimals,
   }).format(value)
+}
+
+/**
+ * Get currency symbol for a country
+ */
+export function getCurrencySymbol(country: Country = 'Philippines'): string {
+  return CURRENCY_CONFIG[country].symbol
+}
+
+/**
+ * Get currency code for a country
+ */
+export function getCurrencyCode(country: Country = 'Philippines'): string {
+  return CURRENCY_CONFIG[country].code
 }
 
 /**

@@ -23,7 +23,7 @@ import {
 import { Inputs, Derived, Scenario } from '@/data/types'
 import { DEFAULTS } from '@/data/defaults'
 import { validateInputs, calculateDerived } from '@/lib/validation'
-import { formatCurrency, formatNumber, formatPercent } from '@/lib/format'
+import { formatCurrency, formatNumber, formatPercent, getCurrencyCode, type Country } from '@/lib/format'
 import { getCurrentStep, setStep, listenToHashChange } from '@/lib/hashStep'
 import { ArrowRight, Edit, Download, ChevronLeft, Share2, Printer } from 'lucide-react'
 
@@ -35,6 +35,8 @@ export function Calculator() {
   const [showEditDrawer, setShowEditDrawer] = useState(false)
   const [hasSeenResults, setHasSeenResults] = useState(false)
   const [scenarioName, setScenarioName] = useState<string>('')
+  const [country, setCountry] = useState<Country>('Philippines')
+  const [localityName, setLocalityName] = useState<string>('')
 
   // Listen to hash changes
   useEffect(() => {
@@ -48,10 +50,12 @@ export function Calculator() {
     setDerived(calculateDerived(inputs))
   }, [inputs])
 
-  const handleScenarioSelect = (scenario: Scenario) => {
+  const handleScenarioSelect = (scenario: Scenario, selectedCountry: Country, selectedLocalityName?: string) => {
     const newInputs = scenario.apply(inputs)
     setInputs(newInputs)
     setScenarioName(scenario.name)
+    setCountry(selectedCountry)
+    setLocalityName(selectedLocalityName || '')
     setStep(1)
   }
 
@@ -101,7 +105,7 @@ export function Calculator() {
   const handleShare = async () => {
     const shareData = {
       title: 'Zero Waste Asia Calculator Results',
-      text: `Zero Waste Calculator - Population: ${inputs.population.toLocaleString()}, Annual Waste: ${formatNumber(derived.totalAnnualTons, 1)} tons, Net Savings: ${formatCurrency(derived.avoidedDisposalSavings + derived.compostRevenue - derived.afterZWCost, 0)}`,
+      text: `Zero Waste Calculator - Population: ${inputs.population.toLocaleString()}, Annual Waste: ${formatNumber(derived.totalAnnualTons, 1)} tons, Net Savings: ${formatCurrency(derived.avoidedDisposalSavings + derived.compostRevenue - derived.afterZWCost, country, 0)}`,
       url: window.location.href,
     }
 
@@ -192,8 +196,15 @@ export function Calculator() {
           <Section>
             <SectionTitle>Program Inputs</SectionTitle>
             <SectionDescription>
-              Enter the parameters for your community's waste management program. All fields are
-              required.
+              {localityName ? (
+                <>
+                  Enter the parameters for <strong>{localityName}</strong>, {country}. All fields are required.
+                </>
+              ) : (
+                <>
+                  Enter the parameters for your community's waste management program. All fields are required.
+                </>
+              )}
             </SectionDescription>
 
             <div className="space-y-6">
@@ -331,7 +342,7 @@ export function Calculator() {
                   min={0}
                   error={errors.baselineCostPerTon}
                   helper="Current disposal cost per ton"
-                  suffix="PHP/ton"
+                  suffix={`${getCurrencyCode(country)}/ton`}
                 />
               </div>
 
@@ -375,7 +386,7 @@ export function Calculator() {
                     step="0.5"
                     min={0}
                     error={errors.compostPricePerKg}
-                    suffix="PHP"
+                    suffix={getCurrencyCode(country)}
                   />
                 </div>
               </div>
@@ -456,7 +467,7 @@ export function Calculator() {
                 <AccordionContent>
                   <Explainer>
                     <p>
-                      {formatNumber(derived.totalAnnualTons, 2)} tons/year × {formatCurrency(inputs.baselineCostPerTon, 0)}/ton = <strong>{formatCurrency(derived.baselineCost, 0)}/year</strong>
+                      {formatNumber(derived.totalAnnualTons, 2)} tons/year × {formatCurrency(inputs.baselineCostPerTon, country, 0)}/ton = <strong>{formatCurrency(derived.baselineCost, country, 0)}/year</strong>
                     </p>
                     <p className="text-xs mt-2">This is the cost of disposing all waste with no diversion programs.</p>
                   </Explainer>
@@ -477,10 +488,10 @@ export function Calculator() {
                         <strong>Compost produced:</strong> {formatNumber(derived.divertedOrganicsTons, 2)} tons × 1,000 = <strong>{formatNumber(derived.compostKg, 0)} kg</strong>
                       </p>
                       <p>
-                        <strong>Compost revenue:</strong> {formatNumber(derived.compostKg, 0)} kg × {formatCurrency(inputs.compostPricePerKg, 2)}/kg = <strong>{formatCurrency(derived.compostRevenue, 0)}</strong>
+                        <strong>Compost revenue:</strong> {formatNumber(derived.compostKg, 0)} kg × {formatCurrency(inputs.compostPricePerKg, country, 2)}/kg = <strong>{formatCurrency(derived.compostRevenue, country, 0)}</strong>
                       </p>
                       <p>
-                        <strong>Avoided disposal cost:</strong> {formatNumber(derived.divertedOrganicsTons, 2)} t/yr × {formatCurrency(inputs.baselineCostPerTon, 0)}/ton = <strong>{formatCurrency(derived.avoidedDisposalSavings, 0)}</strong>
+                        <strong>Avoided disposal cost:</strong> {formatNumber(derived.divertedOrganicsTons, 2)} t/yr × {formatCurrency(inputs.baselineCostPerTon, country, 0)}/ton = <strong>{formatCurrency(derived.avoidedDisposalSavings, country, 0)}</strong>
                       </p>
                     </div>
                   </Explainer>
@@ -494,7 +505,7 @@ export function Calculator() {
                 <AccordionContent>
                   <Explainer>
                     <p>
-                      {formatCurrency(derived.baselineCost, 0)} (baseline) − {formatCurrency(derived.avoidedDisposalSavings, 0)} (avoided disposal) = <strong>{formatCurrency(derived.afterZWCost, 0)}/year</strong>
+                      {formatCurrency(derived.baselineCost, country, 0)} (baseline) − {formatCurrency(derived.avoidedDisposalSavings, country, 0)} (avoided disposal) = <strong>{formatCurrency(derived.afterZWCost, country, 0)}/year</strong>
                     </p>
                     <p className="text-xs mt-2">
                       <em>Note:</em> This first-pass estimate excludes program O&M costs, CAPEX amortization, and recycling revenues. Future versions will include these modules.
@@ -517,7 +528,15 @@ export function Calculator() {
           <Section>
             <SectionTitle>Step 3: Waste Characterization</SectionTitle>
             <SectionDescription>
-              Distribution of waste by stream for your community (tons per year).
+              {localityName ? (
+                <>
+                  Distribution of waste by stream for <strong>{localityName}</strong>, {country} (tons per year).
+                </>
+              ) : (
+                <>
+                  Distribution of waste by stream for your community (tons per year).
+                </>
+              )}
             </SectionDescription>
 
             <WastePie derived={derived} />
@@ -547,23 +566,23 @@ export function Calculator() {
               Compare your baseline waste management costs with costs after implementing composting.
             </SectionDescription>
 
-            <CostBars derived={derived} />
+            <CostBars derived={derived} country={country} />
 
             <div className="grid md:grid-cols-2 gap-4 mt-6">
               <Metric
                 label="Before ZW Program"
-                value={formatCurrency(derived.baselineCost, 0)}
+                value={formatCurrency(derived.baselineCost, country, 0)}
                 subtext="Annual disposal cost"
               />
               <Metric
                 label="After Diversion (Organics)"
-                value={formatCurrency(derived.afterZWCost, 0)}
+                value={formatCurrency(derived.afterZWCost, country, 0)}
                 subtext="Net cost after avoided disposal"
               />
             </div>
 
             <Explainer className="mt-6">
-              By diverting {formatNumber(derived.divertedOrganicsTons, 2)} tons of organics through composting, you reduce disposal costs by {formatCurrency(derived.avoidedDisposalSavings, 0)} per year.
+              By diverting {formatNumber(derived.divertedOrganicsTons, 2)} tons of organics through composting, you reduce disposal costs by {formatCurrency(derived.avoidedDisposalSavings, country, 0)} per year.
             </Explainer>
 
             <Button onClick={() => setStep(5)} size="lg" className="mt-6">
@@ -577,20 +596,28 @@ export function Calculator() {
           <Section>
             <SectionTitle>Step 5: Savings & Income</SectionTitle>
             <SectionDescription>
-              Financial benefits from avoided disposal costs and compost sales.
+              {localityName ? (
+                <>
+                  Financial benefits from avoided disposal costs and compost sales for <strong>{localityName}</strong>, {country}.
+                </>
+              ) : (
+                <>
+                  Financial benefits from avoided disposal costs and compost sales.
+                </>
+              )}
             </SectionDescription>
 
-            <SavingsBars derived={derived} />
+            <SavingsBars derived={derived} country={country} />
 
             <div className="grid md:grid-cols-2 gap-4 mt-6">
               <Metric
                 label="Avoided Disposal Savings"
-                value={formatCurrency(derived.avoidedDisposalSavings, 0)}
+                value={formatCurrency(derived.avoidedDisposalSavings, country, 0)}
                 subtext="Cost reduction from diversion"
               />
               <Metric
                 label="Compost Revenue"
-                value={formatCurrency(derived.compostRevenue, 0)}
+                value={formatCurrency(derived.compostRevenue, country, 0)}
                 subtext="Income from compost sales"
               />
             </div>

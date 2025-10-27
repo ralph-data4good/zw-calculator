@@ -9,13 +9,14 @@ import {
   Legend,
 } from 'recharts'
 import { Derived } from '@/data/types'
-import { formatCurrency, formatCompact } from '@/lib/format'
+import { formatCurrency, formatCompact, getCurrencySymbol, type Country } from '@/lib/format'
 
 interface SavingsBarsProps {
   derived: Derived
+  country?: Country
 }
 
-export function SavingsBars({ derived }: SavingsBarsProps) {
+export function SavingsBars({ derived, country = 'Philippines' }: SavingsBarsProps) {
   const data = [
     {
       name: 'Avoided Disposal',
@@ -40,12 +41,12 @@ export function SavingsBars({ derived }: SavingsBarsProps) {
             axisLine={{ stroke: 'var(--border)' }}
           />
           <YAxis
-            tickFormatter={value => `₱${formatCompact(value)}`}
+            tickFormatter={value => `${getCurrencySymbol(country)}${formatCompact(value)}`}
             tick={{ fill: 'var(--fg-muted)' }}
             axisLine={{ stroke: 'var(--border)' }}
           />
           <Tooltip
-            formatter={(value: number) => formatCurrency(value)}
+            formatter={(value: number) => formatCurrency(value, country)}
             contentStyle={{
               backgroundColor: 'var(--bg)',
               border: '1px solid var(--border)',

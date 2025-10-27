@@ -15,7 +15,7 @@ import { SCENARIOS, suggestScenario } from '@/data/scenarios'
 import { ArrowRight } from 'lucide-react'
 
 interface ScenarioMapperProps {
-  onSelectScenario: (scenario: Scenario, localityName?: string) => void
+  onSelectScenario: (scenario: Scenario, country: 'Philippines' | 'Indonesia', localityName?: string) => void
   onSkip: () => void
 }
 
@@ -43,7 +43,7 @@ export function ScenarioMapper({ onSelectScenario, onSkip }: ScenarioMapperProps
 
   const handleContinue = () => {
     if (selected) {
-      onSelectScenario(selected, mapping.localityName || undefined)
+      onSelectScenario(selected, mapping.country, mapping.localityName || undefined)
     }
   }
 
@@ -247,7 +247,7 @@ export function ScenarioMapper({ onSelectScenario, onSkip }: ScenarioMapperProps
 
         {/* Segregation / Participation */}
         <div className="space-y-2">
-          <Label htmlFor="segPart">Segregation / Participation</Label>
+          <Label htmlFor="segPart">Segregation at Source - Participation Rate</Label>
           <Select
             value={mapping.segregationParticipation}
             onValueChange={value =>
@@ -261,12 +261,15 @@ export function ScenarioMapper({ onSelectScenario, onSkip }: ScenarioMapperProps
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="Low">Low</SelectItem>
-              <SelectItem value="Medium">Medium</SelectItem>
-              <SelectItem value="High">High</SelectItem>
+              <SelectItem value="Low">Low (&lt;30% of households)</SelectItem>
+              <SelectItem value="Medium">Medium (30-60% of households)</SelectItem>
+              <SelectItem value="High">High (&gt;60% of households)</SelectItem>
               <SelectItem value="Unsure">Unsure</SelectItem>
             </SelectContent>
           </Select>
+          <p className="text-xs text-fg-muted">
+            Estimate the percentage of households actively separating waste at source
+          </p>
         </div>
 
         {/* Locality Name (optional) */}

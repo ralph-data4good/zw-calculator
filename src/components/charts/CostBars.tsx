@@ -9,13 +9,14 @@ import {
   Legend,
 } from 'recharts'
 import { Derived } from '@/data/types'
-import { formatCurrency, formatCompact } from '@/lib/format'
+import { formatCurrency, formatCompact, getCurrencySymbol, type Country } from '@/lib/format'
 
 interface CostBarsProps {
   derived: Derived
+  country?: Country
 }
 
-export function CostBars({ derived }: CostBarsProps) {
+export function CostBars({ derived, country = 'Philippines' }: CostBarsProps) {
   const data = [
     {
       name: 'Before ZW Program',
@@ -38,12 +39,12 @@ export function CostBars({ derived }: CostBarsProps) {
             axisLine={{ stroke: 'var(--border)' }}
           />
           <YAxis
-            tickFormatter={value => `₱${formatCompact(value)}`}
+            tickFormatter={value => `${getCurrencySymbol(country)}${formatCompact(value)}`}
             tick={{ fill: 'var(--fg-muted)' }}
             axisLine={{ stroke: 'var(--border)' }}
           />
           <Tooltip
-            formatter={(value: number) => formatCurrency(value)}
+            formatter={(value: number) => formatCurrency(value, country)}
             contentStyle={{
               backgroundColor: 'var(--bg)',
               border: '1px solid var(--border)',
@@ -51,7 +52,7 @@ export function CostBars({ derived }: CostBarsProps) {
             }}
           />
           <Legend />
-          <Bar dataKey="cost" fill="var(--primary)" name="Total Cost (PHP/year)" radius={[8, 8, 0, 0]} />
+          <Bar dataKey="cost" fill="var(--primary)" name={`Total Cost (${country === 'Philippines' ? 'PHP' : 'IDR'}/year)`} radius={[8, 8, 0, 0]} />
         </BarChart>
       </ResponsiveContainer>
     </div>
