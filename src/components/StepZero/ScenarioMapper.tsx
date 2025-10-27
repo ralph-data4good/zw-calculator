@@ -15,12 +15,13 @@ import { SCENARIOS, suggestScenario } from '@/data/scenarios'
 import { ArrowRight } from 'lucide-react'
 
 interface ScenarioMapperProps {
-  onSelectScenario: (scenario: Scenario, country: 'Philippines' | 'Indonesia', localityName?: string) => void
+  onSelectScenario: (scenario: Scenario, country: 'Philippines' | 'Indonesia', localityName: string, mappingInputs: ScenarioMappingInputs) => void
   onSkip: () => void
+  initialValues?: ScenarioMappingInputs
 }
 
-export function ScenarioMapper({ onSelectScenario, onSkip }: ScenarioMapperProps) {
-  const [mapping, setMapping] = useState<ScenarioMappingInputs>({
+export function ScenarioMapper({ onSelectScenario, onSkip, initialValues }: ScenarioMapperProps) {
+  const [mapping, setMapping] = useState<ScenarioMappingInputs>(initialValues || {
     country: 'Philippines',
     areaType: 'Urban',
     dominantActivities: [],
@@ -34,6 +35,7 @@ export function ScenarioMapper({ onSelectScenario, onSkip }: ScenarioMapperProps
 
   const [suggested, setSuggested] = useState<Scenario | null>(null)
   const [selected, setSelected] = useState<Scenario | null>(null)
+  const [localityError, setLocalityError] = useState<string>('')
 
   const handleSuggest = () => {
     const scenario = suggestScenario(mapping)
@@ -42,8 +44,13 @@ export function ScenarioMapper({ onSelectScenario, onSkip }: ScenarioMapperProps
   }
 
   const handleContinue = () => {
+    if (!mapping.localityName || mapping.localityName.trim() === '') {
+      setLocalityError('Please enter a locality name to continue')
+      return
+    }
     if (selected) {
-      onSelectScenario(selected, mapping.country, mapping.localityName || undefined)
+      setLocalityError('')
+      onSelectScenario(selected, mapping.country, mapping.localityName.trim(), mapping)
     }
   }
 
@@ -272,16 +279,28 @@ export function ScenarioMapper({ onSelectScenario, onSkip }: ScenarioMapperProps
           </p>
         </div>
 
-        {/* Locality Name (optional) */}
+        {/* Locality Name (required) */}
         <div className="space-y-2">
-          <Label htmlFor="localityName">Locality Name (optional)</Label>
+          <Label htmlFor="localityName" className="flex items-center gap-1">
+            Locality Name <span className="text-red-500">*</span>
+          </Label>
           <Input
             id="localityName"
             type="text"
-            placeholder="e.g., Barangay San Isidro"
+            placeholder="e.g., Barangay San Isidro, Quezon City"
             value={mapping.localityName}
-            onChange={e => setMapping({ ...mapping, localityName: e.target.value })}
+            onChange={e => {
+              setMapping({ ...mapping, localityName: e.target.value })
+              if (localityError) setLocalityError('')
+            }}
+            className={localityError ? 'border-red-500' : ''}
           />
+          {localityError && (
+            <p className="text-xs text-red-500">{localityError}</p>
+          )}
+          <p className="text-xs text-fg-muted">
+            Enter the specific location (e.g., barangay, city, municipality) for this analysis
+          </p>
         </div>
       </div>
 

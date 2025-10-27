@@ -20,7 +20,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion'
-import { Inputs, Derived, Scenario } from '@/data/types'
+import { Inputs, Derived, Scenario, ScenarioMappingInputs } from '@/data/types'
 import { DEFAULTS } from '@/data/defaults'
 import { validateInputs, calculateDerived } from '@/lib/validation'
 import { formatCurrency, formatNumber, formatPercent, getCurrencyCode, type Country } from '@/lib/format'
@@ -37,6 +37,7 @@ export function Calculator() {
   const [scenarioName, setScenarioName] = useState<string>('')
   const [country, setCountry] = useState<Country>('Philippines')
   const [localityName, setLocalityName] = useState<string>('')
+  const [savedScenarioMapping, setSavedScenarioMapping] = useState<ScenarioMappingInputs | undefined>(undefined)
 
   // Listen to hash changes
   useEffect(() => {
@@ -50,12 +51,16 @@ export function Calculator() {
     setDerived(calculateDerived(inputs))
   }, [inputs])
 
-  const handleScenarioSelect = (scenario: Scenario, selectedCountry: Country, selectedLocalityName?: string) => {
+  const handleScenarioSelect = (scenario: Scenario, selectedCountry: Country, selectedLocalityName: string, mappingInputs?: ScenarioMappingInputs) => {
     const newInputs = scenario.apply(inputs)
     setInputs(newInputs)
     setScenarioName(scenario.name)
     setCountry(selectedCountry)
-    setLocalityName(selectedLocalityName || '')
+    setLocalityName(selectedLocalityName)
+    // Save the mapping for when user navigates back
+    if (mappingInputs) {
+      setSavedScenarioMapping(mappingInputs)
+    }
     setStep(1)
   }
 
@@ -186,7 +191,11 @@ export function Calculator() {
             <HowItWorks />
             <Disclaimer />
             <div id="scenario-mapping">
-              <ScenarioMapper onSelectScenario={handleScenarioSelect} onSkip={handleSkipScenario} />
+              <ScenarioMapper 
+                onSelectScenario={handleScenarioSelect} 
+                onSkip={handleSkipScenario}
+                initialValues={savedScenarioMapping}
+              />
             </div>
           </div>
         )}
