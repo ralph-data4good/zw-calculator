@@ -7,10 +7,10 @@ interface WastePieProps {
 }
 
 const COLORS = {
-  organics: '#10b981',
-  recyclables: '#3b82f6',
-  residuals: '#6b7280',
-  special: '#f59e0b',
+  organics: '#489E4A',    // ZWA Green
+  recyclables: '#2179B3', // ZWA Blue
+  residuals: '#737373',   // Neutral gray
+  special: '#D4A73F',     // ZWA Gold
 }
 
 export function WastePie({ derived }: WastePieProps) {

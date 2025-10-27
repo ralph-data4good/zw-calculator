@@ -9,7 +9,7 @@ export function Section({ children, className }: SectionProps) {
   return (
     <section
       className={cn(
-        'rounded-2xl border border-border bg-bg p-6 shadow-sm md:p-8',
+        'rounded-xl border border-border bg-bg p-6 shadow-md md:p-10',
         className
       )}
     >
@@ -25,7 +25,7 @@ interface SectionTitleProps {
 
 export function SectionTitle({ children, className }: SectionTitleProps) {
   return (
-    <h2 className={cn('text-2xl font-semibold text-fg mb-4', className)}>
+    <h2 className={cn('text-2xl md:text-3xl font-bold text-fg mb-4', className)}>
       {children}
     </h2>
   )

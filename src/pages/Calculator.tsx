@@ -131,12 +131,12 @@ export function Calculator() {
   return (
     <div className="min-h-screen bg-bg-muted">
       {/* Header */}
-      <header className="bg-bg border-b border-border sticky top-0 z-40 shadow-sm">
+      <header className="bg-header-bg border-b border-zwa-blue-700 sticky top-0 z-40 shadow-md">
         <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <h1 className="text-xl font-semibold text-fg">ZWA Calculator</h1>
+            <h1 className="text-xl font-bold text-white">Zero Waste Calculator</h1>
             {currentStep > 0 && (
-              <span className="text-sm text-fg-muted">
+              <span className="text-sm text-zwa-blue-200 font-medium">
                 Step {currentStep} of 5
               </span>
             )}
@@ -147,6 +147,7 @@ export function Calculator() {
                 variant="ghost"
                 size="sm"
                 onClick={() => setStep(Math.max(0, currentStep - 1))}
+                className="text-white hover:bg-zwa-blue-700"
               >
                 <ChevronLeft className="h-4 w-4 mr-1" />
                 Back
@@ -154,7 +155,7 @@ export function Calculator() {
             )}
             {hasSeenResults && (
               <>
-                <Button variant="secondary" size="sm" onClick={() => setShowEditDrawer(true)}>
+                <Button variant="primary" size="sm" onClick={() => setShowEditDrawer(true)}>
                   <Edit className="h-4 w-4 mr-1" />
                   Edit Inputs
                 </Button>

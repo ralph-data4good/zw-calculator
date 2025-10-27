@@ -20,12 +20,12 @@ export function SavingsBars({ derived }: SavingsBarsProps) {
     {
       name: 'Avoided Disposal',
       value: derived.avoidedDisposalSavings,
-      fill: '#10b981',
+      fill: '#489E4A', // ZWA Green
     },
     {
       name: 'Compost Revenue',
       value: derived.compostRevenue,
-      fill: '#3b82f6',
+      fill: '#D4A73F', // ZWA Gold
     },
   ]
 

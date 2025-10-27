@@ -8,34 +8,52 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Eco Design System Colors
-        eco: {
-          soft: {
-            1: 'var(--eco-soft-green-1)',
-            2: 'var(--eco-soft-green-2)',
-            3: 'var(--eco-soft-green-3)',
-            4: 'var(--eco-soft-green-4)',
+        // Zero Waste Asia Brand Colors
+        zwa: {
+          blue: {
+            50: 'var(--zwa-blue-50)',
+            100: 'var(--zwa-blue-100)',
+            200: 'var(--zwa-blue-200)',
+            300: 'var(--zwa-blue-300)',
+            400: 'var(--zwa-blue-400)',
+            500: 'var(--zwa-blue-500)',
+            600: 'var(--zwa-blue-600)',
+            700: 'var(--zwa-blue-700)',
+            800: 'var(--zwa-blue-800)',
+            900: 'var(--zwa-blue-900)',
+            950: 'var(--zwa-blue-950)',
           },
-          vibrant: {
-            1: 'var(--eco-vibrant-green-1)',
-            2: 'var(--eco-vibrant-green-2)',
-            3: 'var(--eco-vibrant-green-3)',
-          },
-          accent: {
-            1: 'var(--eco-accent-yellow-1)',
-            2: 'var(--eco-accent-yellow-2)',
-            3: 'var(--eco-accent-yellow-3)',
-          },
-          navy: {
-            1: 'var(--eco-navy-1)',
-            2: 'var(--eco-navy-2)',
-            3: 'var(--eco-navy-3)',
+          gold: {
+            50: 'var(--zwa-gold-50)',
+            100: 'var(--zwa-gold-100)',
+            200: 'var(--zwa-gold-200)',
+            300: 'var(--zwa-gold-300)',
+            400: 'var(--zwa-gold-400)',
+            500: 'var(--zwa-gold-500)',
+            600: 'var(--zwa-gold-600)',
+            700: 'var(--zwa-gold-700)',
+            800: 'var(--zwa-gold-800)',
+            900: 'var(--zwa-gold-900)',
+            950: 'var(--zwa-gold-950)',
           },
         },
-        brand: {
-          400: 'var(--brand-400)',
-          500: 'var(--brand-500)',
-          600: 'var(--brand-600)',
+        neutral: {
+          50: 'var(--neutral-50)',
+          100: 'var(--neutral-100)',
+          200: 'var(--neutral-200)',
+          300: 'var(--neutral-300)',
+          400: 'var(--neutral-400)',
+          500: 'var(--neutral-500)',
+          600: 'var(--neutral-600)',
+          700: 'var(--neutral-700)',
+          800: 'var(--neutral-800)',
+          900: 'var(--neutral-900)',
+          950: 'var(--neutral-950)',
+        },
+        green: {
+          500: 'var(--green-500)',
+          600: 'var(--green-600)',
+          700: 'var(--green-700)',
         },
         bg: 'var(--bg)',
         'bg-muted': 'var(--bg-muted)',
@@ -48,8 +66,13 @@ export default {
         'primary-light': 'var(--primary-light)',
         'primary-dark': 'var(--primary-dark)',
         'primary-contrast': 'var(--primary-contrast)',
+        secondary: 'var(--secondary)',
+        'secondary-light': 'var(--secondary-light)',
+        'secondary-dark': 'var(--secondary-dark)',
+        'secondary-contrast': 'var(--secondary-contrast)',
         accent: 'var(--accent)',
         'accent-dark': 'var(--accent-dark)',
+        'header-bg': 'var(--header-bg)',
       },
       fontFamily: {
         sans: ['var(--font-sans)'],

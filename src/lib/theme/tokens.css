@@ -1,64 +1,79 @@
 :root {
-  /* Eco Design System - Primary Colors */
-  --eco-soft-green-1: #A8C5A3;
-  --eco-soft-green-2: #B8D4B8;
-  --eco-soft-green-3: #9BB89B;
-  --eco-soft-green-4: #E8F0E8;
-  
-  --eco-vibrant-green-1: #4A7C59;
-  --eco-vibrant-green-2: #5A8C69;
-  --eco-vibrant-green-3: #3A6C49;
-  
-  --eco-accent-yellow-1: #F5C563;
-  --eco-accent-yellow-2: #E8B84D;
-  --eco-accent-yellow-3: #D4A440;
+  /* Zero Waste Asia Brand Colors - Primary (Blue) Scale */
+  --zwa-blue-50: #E6F2F8;
+  --zwa-blue-100: #C2E0EE;
+  --zwa-blue-200: #9BCDE4;
+  --zwa-blue-300: #74BADA;
+  --zwa-blue-400: #53A7D0;
+  --zwa-blue-500: #2179B3;  /* Main ZWA Blue */
+  --zwa-blue-600: #1A628F;
+  --zwa-blue-700: #14526F;
+  --zwa-blue-800: #0D3A4E;
+  --zwa-blue-900: #072233;
+  --zwa-blue-950: #041419;
 
-  /* Neutrals */
-  --eco-bg-white: #FFFFFF;
-  --eco-bg-light-1: #F8F9F8;
-  --eco-bg-light-2: #F5F7F5;
-  --eco-bg-light-3: #FEFFFE;
-  
-  --eco-text-dark-1: #1A1A1A;
-  --eco-text-dark-2: #2D3E2D;
-  --eco-text-dark-3: #3F4F3F;
-  
-  --eco-border-1: #E0E5E0;
-  --eco-border-2: #D5DAD5;
-  --eco-border-3: #C8CEC8;
+  /* Zero Waste Asia Brand Colors - Secondary (Gold/Yellow) Scale */
+  --zwa-gold-50: #FDFAF2;
+  --zwa-gold-100: #F9F0D9;
+  --zwa-gold-200: #F3E3B8;
+  --zwa-gold-300: #EDD597;
+  --zwa-gold-400: #E7C876;
+  --zwa-gold-500: #D4A73F;  /* Main ZWA Gold */
+  --zwa-gold-600: #B8923A;
+  --zwa-gold-700: #927432;
+  --zwa-gold-800: #6C5628;
+  --zwa-gold-900: #46381A;
+  --zwa-gold-950: #2E240F;
 
-  /* Dark mode colors */
-  --eco-navy-1: #2C3E50;
-  --eco-navy-2: #34495E;
-  --eco-navy-3: #1C2833;
+  /* Neutral Scale */
+  --neutral-50: #FAFAFA;
+  --neutral-100: #F5F5F5;
+  --neutral-200: #E5E5E5;
+  --neutral-300: #D4D4D4;
+  --neutral-400: #A3A3A3;
+  --neutral-500: #737373;
+  --neutral-600: #525252;
+  --neutral-700: #404040;
+  --neutral-800: #262626;
+  --neutral-900: #171717;
+  --neutral-950: #0A0A0A;
 
-  /* Brand colors - mapped to eco palette */
-  --brand-600: var(--eco-vibrant-green-1);
-  --brand-500: var(--eco-vibrant-green-2);
-  --brand-400: var(--eco-soft-green-1);
+  /* Green Accent (for eco-friendly elements) */
+  --green-500: #489E4A;
+  --green-600: #3A7F3C;
+  --green-700: #2C5F2E;
 
   /* Backgrounds */
-  --bg: var(--eco-bg-white);
-  --bg-muted: var(--eco-bg-light-2);
-  --bg-card: var(--eco-bg-light-3);
+  --bg: #FFFFFF;
+  --bg-muted: var(--neutral-50);
+  --bg-card: #FFFFFF;
 
   /* Foregrounds */
-  --fg: var(--eco-text-dark-1);
-  --fg-muted: var(--eco-text-dark-3);
+  --fg: var(--neutral-900);
+  --fg-muted: var(--neutral-600);
 
   /* Border */
-  --border: var(--eco-border-1);
-  --border-muted: var(--eco-border-2);
+  --border: var(--neutral-200);
+  --border-muted: var(--neutral-100);
 
-  /* Primary (mapped to vibrant green) */
-  --primary: var(--eco-vibrant-green-1);
-  --primary-light: var(--eco-vibrant-green-2);
-  --primary-dark: var(--eco-vibrant-green-3);
+  /* Primary (ZWA Blue) */
+  --primary: var(--zwa-blue-500);
+  --primary-light: var(--zwa-blue-400);
+  --primary-dark: var(--zwa-blue-700);
   --primary-contrast: #ffffff;
 
-  /* Accent (mapped to yellow) */
-  --accent: var(--eco-accent-yellow-1);
-  --accent-dark: var(--eco-accent-yellow-3);
+  /* Secondary (ZWA Gold) */
+  --secondary: var(--zwa-gold-500);
+  --secondary-light: var(--zwa-gold-400);
+  --secondary-dark: var(--zwa-gold-600);
+  --secondary-contrast: var(--neutral-900);
+
+  /* Accent colors for emphasis */
+  --accent: var(--zwa-gold-500);
+  --accent-dark: var(--zwa-gold-600);
+  
+  /* Header background - Dark teal from ZWA website */
+  --header-bg: var(--zwa-blue-800);
 
   /* Font - Eco Design System recommends system sans-serif */
   --font-sans: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, ui-sans-serif, system-ui, sans-serif;
@@ -93,14 +108,19 @@
 }
 
 :root.dark {
-  --bg: var(--eco-navy-3);
-  --bg-muted: var(--eco-navy-1);
-  --bg-card: var(--eco-navy-2);
-  --fg: var(--eco-bg-light-1);
-  --fg-muted: var(--eco-soft-green-4);
+  --bg: var(--zwa-blue-950);
+  --bg-muted: var(--zwa-blue-900);
+  --bg-card: var(--zwa-blue-800);
+  --fg: var(--neutral-50);
+  --fg-muted: var(--neutral-400);
   --border: rgba(255, 255, 255, 0.1);
   --border-muted: rgba(255, 255, 255, 0.05);
-  --primary: var(--eco-soft-green-1);
-  --primary-light: var(--eco-soft-green-2);
-  --primary-contrast: var(--eco-navy-3);
+  --primary: var(--zwa-blue-400);
+  --primary-light: var(--zwa-blue-300);
+  --primary-dark: var(--zwa-blue-600);
+  --primary-contrast: var(--zwa-blue-950);
+  --secondary: var(--zwa-gold-400);
+  --secondary-light: var(--zwa-gold-300);
+  --secondary-dark: var(--zwa-gold-500);
+  --header-bg: var(--zwa-blue-900);
 }

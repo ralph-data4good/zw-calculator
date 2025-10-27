@@ -23,19 +23,19 @@ const features = [
 
 export function FeatureCards() {
   return (
-    <div className="grid md:grid-cols-3 gap-6 my-12">
+    <div className="grid md:grid-cols-3 gap-8 my-16">
       {features.map(feature => {
         const Icon = feature.icon
         return (
           <div
             key={feature.title}
-            className="rounded-2xl border border-border bg-bg p-6 shadow-sm hover:shadow-md transition-shadow"
+            className="rounded-xl border border-border bg-bg p-8 shadow-md hover:shadow-lg transition-all hover:-translate-y-1"
           >
-            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">
-              <Icon className="h-6 w-6 text-primary" />
+            <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-xl bg-zwa-blue-100">
+              <Icon className="h-7 w-7 text-primary" />
             </div>
-            <h3 className="text-lg font-semibold text-fg mb-2">{feature.title}</h3>
-            <p className="text-fg-muted text-sm leading-relaxed">{feature.description}</p>
+            <h3 className="text-xl font-bold text-fg mb-3">{feature.title}</h3>
+            <p className="text-fg-muted text-base leading-relaxed">{feature.description}</p>
           </div>
         )
       })}
